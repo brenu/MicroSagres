@@ -65,16 +65,21 @@ export default function Turma() {
   }, [estudanteId]);
 
   function handleCloseModal(event) {
-    if (event.target !== event.currentTarget) return;
+    if (event.target.classList[0] !== "modal-background") return;
 
-    setShowModal((showModal) => !showModal);
     setEstudante({});
     setIsLoadingEstudante(true);
+    setShowModal((showModal) => !showModal);
   }
 
   function handleEstudanteModal(id) {
-    setEstudanteId(id);
     setShowModal((showModal) => !showModal);
+    if (id == estudanteId) {
+      handleEstudanteInfo();
+      return;
+    }
+
+    setEstudanteId(id);
   }
 
   async function handleEstudanteInfo() {
@@ -111,6 +116,12 @@ export default function Turma() {
     } catch (error) {
       setShowInputTeorico(false);
       setNotaTeorica("0.0");
+      if (error.response.data) {
+        alert(
+          `Não foi possível realizar a operação. \nMotivo: ${error.response.data.reason}.`
+        );
+        return;
+      }
       alert("Não foi possível realizar a operação. \nMotivo: algum.");
     }
   }
@@ -133,6 +144,12 @@ export default function Turma() {
     } catch (error) {
       setNotaPratica("0.0");
       setShowInputPratico(false);
+      if (error.response.data) {
+        alert(
+          `Não foi possível realizar a operação. \nMotivo: ${error.response.data.reason}.`
+        );
+        return;
+      }
       alert("Não foi possível realizar a operação. \nMotivo: algum.");
     }
   }
@@ -255,7 +272,10 @@ export default function Turma() {
   return (
     <div className="container">
       {showModal && (
-        <div className="modal-background" onClick={(e) => handleCloseModal(e)}>
+        <div
+          className="modal-background"
+          onMouseDown={(e) => handleCloseModal(e)}
+        >
           <div className="modal-container">
             {!isLoadingEstudante ? (
               <>
@@ -266,50 +286,53 @@ export default function Turma() {
                     <FaPlus color="#FF6800" size="15pt" />
                   </button>
                 </div>
-                {estudante.creditosTeoricos.map((credito) => (
-                  <div className="credito-container">
-                    {!credito.edit ? (
-                      <>
-                        <span>{credito.notaOriginal}</span>
-                        <div className="actions-container">
+                {estudante.creditosTeoricos &&
+                  estudante.creditosTeoricos.map((credito) => (
+                    <div className="credito-container" key={credito.id}>
+                      {!credito.edit ? (
+                        <>
+                          <span>{credito.notaOriginal}</span>
+                          <div className="actions-container">
+                            <button
+                              onClick={() =>
+                                handleEditNota(credito.id, "teorico")
+                              }
+                            >
+                              <FaEdit color="#777777" size="15pt" />
+                            </button>
+                            <button onClick={() => handleDelete(credito.id)}>
+                              <FaTrash color="#FF4D4D" size="15pt" />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="input-container">
+                          <input
+                            type="text"
+                            value={credito.nota}
+                            style={{ marginLeft: 0 }}
+                            onChange={(e) =>
+                              handleChangeCredito(e, credito.id, credito.tipo)
+                            }
+                          />
+                          <button
+                            onClick={() =>
+                              handleUpdateCredito(credito.id, credito.nota)
+                            }
+                          >
+                            <FaCheck size="15pt" color="#4BB543" />
+                          </button>
                           <button
                             onClick={() =>
                               handleEditNota(credito.id, "teorico")
                             }
                           >
-                            <FaEdit color="#777777" size="15pt" />
-                          </button>
-                          <button onClick={() => handleDelete(credito.id)}>
-                            <FaTrash color="#FF4D4D" size="15pt" />
+                            <FaTimes size="15pt" color="#777" />
                           </button>
                         </div>
-                      </>
-                    ) : (
-                      <div className="input-container">
-                        <input
-                          type="text"
-                          value={credito.nota}
-                          style={{ marginLeft: 0 }}
-                          onChange={(e) =>
-                            handleChangeCredito(e, credito.id, credito.tipo)
-                          }
-                        />
-                        <button
-                          onClick={() =>
-                            handleUpdateCredito(credito.id, credito.nota)
-                          }
-                        >
-                          <FaCheck size="15pt" color="#4BB543" />
-                        </button>
-                        <button
-                          onClick={() => handleEditNota(credito.id, "teorico")}
-                        >
-                          <FaTimes size="15pt" color="#777" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  ))}
                 {showInputTeorico && (
                   <div id="input-teorico-container" className="input-container">
                     <input
@@ -338,52 +361,55 @@ export default function Turma() {
                     <FaPlus color="#FF6800" size="15pt" />
                   </button>
                 </div>
-                {estudante.creditosPraticos.map((credito) => (
-                  <div className="credito-container">
-                    {!credito.edit ? (
-                      <>
-                        <span>{credito.notaOriginal}</span>
-                        <div className="actions-container">
+                {estudante.creditosPraticos &&
+                  estudante.creditosPraticos.map((credito) => (
+                    <div className="credito-container" key={credito.id}>
+                      {!credito.edit ? (
+                        <>
+                          <span>{credito.notaOriginal}</span>
+                          <div className="actions-container">
+                            <button
+                              onClick={() =>
+                                handleEditNota(credito.id, "pratico")
+                              }
+                            >
+                              <FaEdit color="#777777" size="15pt" />
+                            </button>
+                            <button onClick={() => handleDelete(credito.id)}>
+                              <FaTrash color="#FF4D4D" size="15pt" />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="input-container">
+                          <input
+                            type="text"
+                            value={notaPratica}
+                            onChange={(e) =>
+                              setNotaPratica(
+                                numberMask(e.target.value, notaPratica)
+                              )
+                            }
+                            style={{ marginLeft: 0 }}
+                          />
+                          <button
+                            onClick={() =>
+                              handleUpdateCredito(credito.id, credito.nota)
+                            }
+                          >
+                            <FaCheck size="15pt" color="#4BB543" />
+                          </button>
                           <button
                             onClick={() =>
                               handleEditNota(credito.id, "pratico")
                             }
                           >
-                            <FaEdit color="#777777" size="15pt" />
-                          </button>
-                          <button onClick={() => handleDelete(credito.id)}>
-                            <FaTrash color="#FF4D4D" size="15pt" />
+                            <FaTimes size="15pt" color="#777" />
                           </button>
                         </div>
-                      </>
-                    ) : (
-                      <div className="input-container">
-                        <input
-                          type="text"
-                          value={notaPratica}
-                          onChange={(e) =>
-                            setNotaPratica(
-                              numberMask(e.target.value, notaPratica)
-                            )
-                          }
-                          style={{ marginLeft: 0 }}
-                        />
-                        <button
-                          onClick={() =>
-                            handleUpdateCredito(credito.id, credito.nota)
-                          }
-                        >
-                          <FaCheck size="15pt" color="#4BB543" />
-                        </button>
-                        <button
-                          onClick={() => handleEditNota(credito.id, "pratico")}
-                        >
-                          <FaTimes size="15pt" color="#777" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  ))}
                 {showInputPratico && (
                   <div id="input-pratico-container" className="input-container">
                     <input
@@ -408,7 +434,11 @@ export default function Turma() {
                 )}
                 <div className="media-container">
                   <h4>Média Parcial</h4>
-                  <span>{estudante.media}</span>
+                  <span>
+                    {typeof estudante.media === "string"
+                      ? parseFloat(estudante.media).toFixed(2)
+                      : estudante.media}
+                  </span>
                 </div>
               </>
             ) : (

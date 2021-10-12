@@ -99,7 +99,13 @@ app.post("/avaliacao", async (req, res) => {
 
     return res.status(200).json(resultado);
   } catch (error) {
-    return res.status(400).json({ success: false, reason: "Não interessa :D" });
+    let errorMessage = "Só Deus sabe :D";
+
+    if (error.message.split(" ")[0] === "Quantidade") {
+      errorMessage = error.message;
+    }
+
+    return res.status(400).json({ success: false, reason: errorMessage });
   }
 });
 
