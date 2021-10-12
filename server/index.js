@@ -90,10 +90,12 @@ app.post("/avaliacao", async (req, res) => {
   try {
     const { nota, tipo, turma, estudante } = req.body;
 
-    const resultado = await db.query(
-      "INSERT INTO avaliacao (nota, tipo, turma, estudante) VALUES ($1, $2, $3, $4)",
-      [nota, tipo, turma, estudante]
-    );
+    const resultado = await db.proc("cria_avaliacao", [
+      estudante,
+      turma,
+      nota,
+      tipo,
+    ]);
 
     return res.status(200).json(resultado);
   } catch (error) {

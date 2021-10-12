@@ -59,10 +59,6 @@ export default function Turma() {
   }, []);
 
   useEffect(() => {
-    console.log(estudante);
-  }, [estudante]);
-
-  useEffect(() => {
     if (estudanteId) {
       handleEstudanteInfo();
     }
@@ -410,7 +406,7 @@ export default function Turma() {
                     </button>
                   </div>
                 )}
-                <div class="media-container">
+                <div className="media-container">
                   <h4>Média Parcial</h4>
                   <span>{estudante.media}</span>
                 </div>
