@@ -8,7 +8,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useHistory } from "react-router-dom";
 import api from "../../services/api";
 
 import "./styles.css";
@@ -29,10 +29,16 @@ export default function Turma() {
   const [notaPratica, setNotaPratica] = useState("0.0");
 
   const location = useLocation();
+  const history = useHistory();
   const turmaId = useParams().id;
 
   useEffect(() => {
     async function handleInit() {
+      if (!location.state) {
+        history.push("/");
+        return;
+      }
+
       const { nome } = location.state;
 
       const resultado = await api.get(`/turma/${turmaId}`);

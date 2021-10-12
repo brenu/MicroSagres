@@ -22,15 +22,9 @@ app.get("/disciplinas", async (req, res) => {
   const professorId = req.headers["professor-id"];
 
   let resultado = await db.query(
-    "SELECT turma.id, disciplina.nome AS nome_disciplina, turma.nome AS nome_turma FROM turma INNER JOIN disciplina ON disciplina.id = turma.disciplina WHERE turma.professor = $1",
+    "SELECT turma.id, disciplina.nome AS nome_disciplina, turma.nome AS nome_turma, CONCAT(disciplina.nome,' - ',turma.nome) AS nome FROM turma INNER JOIN disciplina ON disciplina.id = turma.disciplina WHERE turma.professor = $1",
     [professorId]
   );
-
-  resultado = await resultado.map((item) => {
-    item.nome = `${item.nome_disciplina} - ${item.nome_turma}`;
-
-    return item;
-  });
 
   return res.status(200).json(resultado);
 });
