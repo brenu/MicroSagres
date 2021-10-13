@@ -63,3 +63,31 @@ h2 {
   color: #ff6800;
   font-weight: bold;
 }
+
+@media (max-width: 600px) {
+  .container {
+    max-width: 400px;
+    padding: 10px;
+  }
+
+  .alunos {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0 !important;
+    grid-gap: 0 !important;
+  }
+
+  .alunos button {
+    padding: 25px 25px 0 25px;
+  }
+
+  .alunos button:last-of-type {
+    margin-bottom: 30px;
+  }
+
+  .modal-container {
+    min-width: unset !important;
+  }
+}
